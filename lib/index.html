@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 Электронная библиотека</title>
+    <style>
+        /* ============================================
+           ВСЕ СТИЛИ В ОДНОМ ФАЙЛЕ
+           ============================================ */
+        
+        /* ===== Базовые стили ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        body.dark-theme {
+            background: #0d0d1a;
+            color: #e8e8f0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* ===== Шапка ===== */
+        .header {
+            background: white;
+            border-bottom: 1px solid #e8e9f0;
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        body.dark-theme .header {
+            background: #1a1a2e;
+            border-color: #2a2a4a;
+        }
+
+        .header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .header__logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header__logo h1 {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6C63FF, #3F3D9E);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header__nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .header__nav a {
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 14px;
+            color: #4a4a6a;
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        body.dark-theme .header__nav a {
+            color: #b0b0d0;
+        }
+
+        .header__nav a:hover {
+            background: #f0f1ff;
+            color: #6C63FF;
+        }
+
+        body.dark-theme .header__nav a:hover {
+            background: #2a2a4a;
+        }
+
+        .header__nav a.active {
+            background: linear-gradient(135deg, #6C63FF, #3F3D9E);
+            color: white !important;
+            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+        }
+
+        .theme-toggle,
+        .auth-btn {
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 14px;
+            border: 1px solid #e8e9f0;
+            background: transparent;
+            color: #4a4a6a;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        body.dark-theme .theme-toggle,
+        body.dark-theme .auth-btn {
+            border-color: #2a2a4a;
+            color: #b0b0d0;
+        }
+
+        .theme-toggle:hover,
+        .auth-btn:hover {
+            background: #f0f1ff;
+            border-color: #6C63FF;
+            color: #6C63FF;
+        }
+
+        body.dark-theme .theme-toggle:hover,
+        body.dark-theme .auth-btn:hover {
+            background: #2a2a4a;
+        }
+
+        .auth-btn {
+            background: linear-gradient(135deg, #6C63FF, #3F3D9E);
+            color: white !important;
+            border: none;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(108, 99, 255, 0.35);
+            background: linear-gradient(135deg, #6C63FF, #3F3D9E) !important;
+        }
+
+        /* ===== Основной контент ===== */
+        .main {
+            padding: 40px 0;
+            min-height: 70vh;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== Каталог ===== */
+        .catalog-header {
+            margin-bottom: 32px;
+        }
+
+        .catalog-header h2 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #6C63FF, #3F3D9E);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .search-filters {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #e8e9f0;
+        }
+
+        body.dark-theme .search-filters {
+            background: #1a1a2e;
+            border-color: #2a2a4a;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 16px;
+            border: 2px solid #e8e9f0;
+            border-radius: 20px;
+            font-size: 14px;
+            background: #f8f9fe;
+            transition: all 0.3s;
+            color: #1a1a2e;
+        }
+
+        body.dark-theme .search-input {
+            background: #0d0d1a;
+            border-color: #2a2a4a;
+            color: #e8e8f0;
+        }
+
+        .search-input:focus {
+            border-color: #6C63FF;
+            box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.1);
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: #8a8aaa;
+        }
+
+        .filter-select {
+            padding: 10px 16px;
+            border: 2px solid #e8e9f0;
+            border-radius: 20px;
+            font-size: 14px;
+            background: #f8f9fe;
+            color: #1a1a2e;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 140px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A8AAA' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+
+        body.dark-theme .filter-select {
+            background: #0d0d1a;
+            border-color: #2a2a4a;
+            color: #e8e8f0;
+        }
+
+        .filter-select:focus {
+            border-color: #6C63FF;
+            box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.1);
+            outline: none;
+        }
+
+        /* ===== Сетка книг ===== */
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 24px;
+            margin: 24px 0;
+        }
+
+        /* ===== Карточка книги (БЕЗ ОБЛОЖКИ) ===== */
+        .book-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 1px solid #e8e9f0;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body.dark-theme .book-card {
+            background: #1a1a2e;
+            border-color: #2a2a4a;
+        }
+
+        .book-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px rgba(108, 99, 255, 0.15);
+            border-color: #6C63FF;
+        }
+
+        .book-card__badge {
+            align-self: flex-start;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #6C63FF, #3F3D9E);
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .book-card__title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .book-card__author {
+            font-size: 14px;
+            color: #6a6a8a;
+        }
+
+        body.dark-theme .book-card__author {
+            color: #8a8aaa;
+        }
+
+        .book-card__meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e8e9f0;
+        }
+
+        body.dark-theme .book-card__meta {
+            border-color: #2a2a4a;
+        }
+
+        .book-card__rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .book-card__rating .stars {
+            color: #ffb800;
+        }
+
+        .book-card__year {
+            font-size: 12px;
+            color: #8a8aaa;
+        }
+
+        /* ===== Пагинация ===== */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        .page-btn {
+            padding: 10px 24px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: white;
+            color: #4a4a6a;
+            border: 1px solid #e8e9f0;
+            cursor: pointer;
+        }
+
+        body.dark-theme .page-btn {
+            background: #1a1a2e;
+            border-color: #2a2a4a;
+            color: #b0b0d0;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #6C63FF, #3F3D9E);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+            border-color: #6C63FF;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        #pageInfo {
+            font-weight: 500;
+            color: #4a4a6a;
+            font-size: 14px;
+        }
+
+        body.dark-theme #pageInfo {
+            color: #b0b0d0;
+        }
+
+        /* ===== Пустое состояние ===== */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 0;
+            color: #8a8aaa;
+        }
+
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .empty-state .title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #4a4a6a;
+        }
+
+        body.dark-theme .empty-state .title {
+            color: #b0b0d0;
+        }
+
+        .empty-state .subtitle {
+            font-size: 14px;
+        }
+
+        /* ===== Кнопка назад ===== */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 14px;
+            color: #4a4a6a;
+            background: white;
+            border: 1px solid #e8e9f0;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 24px;
+        }
+
+        body.dark-theme .back-btn {
+            background: #1a1a2e;
+            border-color: #2a2a4a;
+            color: #b0b0d0;
+        }
+
+        .back-btn:hover {
+            background: #f0f1ff;
+            color: #6C63FF;
+            border-color: #6C63FF;
+            transform: translateX(-4px);
+        }
+
+        body.dark-theme .back-btn:hover {
+            background: #2a2a4a;
+        }
+
+        /* ===== Страница книги (БЕЗ ОБЛОЖКИ) ===== */
+        .book-detail {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            border: 1px solid #e8e9f0;
+        }
+
+        body.dark-theme .book-detail {
+            background: #1a1a2e;
+            border-color: #2a2a4a;
+        }
+
+        .book-detail__header {
+            display: flex;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+
+        .book-detail__cover {
+            display: none;
+        }
+
+        .book-detail__info {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .book-detail__title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .book-detail__author {
+            font-size: 18px;
+            color: #6a6a8a;
+            margin-bottom: 12px;
+        }
+
+        body.dark-theme .book-detail__author {
+            color: #8a8aaa;
+        }
+
+        .book-detail__meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .book-detail__meta span {
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            background: #f0f1ff;
+            color: #4a4a6a;
+        }
+
+        body.dark-theme .book-detail__meta span {
+            background: #2a2a4a;
+            color: #b0b0d0;
+        }
+
+        .book-detail__rating {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+
+        .book-detail__rating .stars {
+            color: #ffb800;
+        }
+
+        .book-detail__rating .count {
+            color: #8a8aaa;
+            font-size: 14px;
+        }
+
+        .book-detail__description {
+            line-height: 1.8;
+            margin-bottom: 24px;
+            color: #4a4a6a;
+        }
+
+        body.dark-theme .book-detail__description {
+            color: #b0b0d0;
+        }
+
+        .book-detail__actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .btn-primary {
+            padding: 12px 32px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 16px;
+            background: linear-gradient(135deg, #6C63FF, #3F3D9E);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(108, 99, 255, 0.35);
+        }
+
+        .btn-secondary {
+            padding: 12px 32px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 16px;
+            background: transparent;
+            color: #4a4a6a;
+            border: 2px solid #e8e9f0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        body.dark-theme .btn-secondary {
+            color: #b0b0d0;
+            border-color: #2a2a4a;
+        }
+
+        .btn-secondary:hover {
+            border-color: #6C63FF;
+            color: #6C63FF;
+            background: #f0f1ff;
+        }
+
+        body.dark-theme .btn-secondary:hover {
+            background: #2a2a4a;
+        }
+
+        /* ===== Подвал ===== */
+        .footer {
+            text-align: center;
+            padding: 32px 0;
+            background: white;
+            border-top: 1px solid #e8e9f0;
+            color: #8a8aaa;
+            font-size: 14px;
+            margin-top: 40px;
+        }
+
+        body.dark-theme .footer {
+            background: #1a1a2e;
+            border-color: #2a2a4a;
+        }
+
+        /* ===== Адаптивность ===== */
+        @media (max-width: 768px) {
+            .header .container {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .header__nav {
+                justify-content: center;
+            }
+
+            .search-filters {
+                flex-direction: column;
+            }
+
+            .books-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                gap: 16px;
+            }
+
+            .book-detail__header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== ШАПКА ===== -->
+    <header class="header">
+        <div class="container">
+            <div class="header__logo">
+                <span style="font-size:28px;">📚</span>
+                <h1>Электронная библиотека</h1>
+            </div>
+            <nav class="header__nav">
+                <a href="#" data-page="catalog" class="active">Каталог</a>
+                <a href="#" data-page="profile">Мои книги</a>
+                <a href="#" data-page="profile">Профиль</a>
+                <a href="#" data-page="admin" id="adminLink" style="display:none;">Админ-панель</a>
+                <button id="themeToggle" class="theme-toggle">🌙</button>
+                <button id="authBtn" class="auth-btn">Войти</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
+    <main class="main">
+        <div class="container">
+            <div id="app">
+                
+                <!-- ===== СТРАНИЦА: КАТАЛОГ ===== -->
+                <section id="page-catalog" class="page active">
+                    <div class="catalog-header">
+                        <h2>📖 Каталог книг</h2>
+                        <div class="search-filters">
+                            <input type="text" id="searchInput" placeholder="🔍 Поиск по названию или автору..." class="search-input">
+                            <select id="genreFilter" class="filter-select">
+                                <option value="all">Все жанры</option>
+                                <option value="Фантастика">Фантастика</option>
+                                <option value="Детектив">Детектив</option>
+                                <option value="Роман">Роман</option>
+                                <option value="Научная литература">Научная литература</option>
+                                <option value="Поэзия">Поэзия</option>
+                            </select>
+                            <select id="sortFilter" class="filter-select">
+                                <option value="popularity">По популярности</option>
+                                <option value="rating">По рейтингу</option>
+                                <option value="newest">По новизне</option>
+                                <option value="title">По названию</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="booksGrid" class="books-grid">
+                        <!-- Карточки книг будут загружены через JS -->
+                    </div>
+                    
+                    <div class="pagination">
+                        <button id="prevPage" class="page-btn" disabled>← Назад</button>
+                        <span id="pageInfo">Страница 1</span>
+                        <button id="nextPage" class="page-btn">Вперёд →</button>
+                    </div>
+                </section>
+
+                <!-- ===== СТРАНИЦА: ПРОФИЛЬ ===== -->
+                <section id="page-profile" class="page">
+                    <h2 style="font-size:28px;font-weight:800;margin-bottom:24px;">👤 Личный кабинет</h2>
+                    <div id="profileContent" style="background:white;border-radius:12px;padding:32px;border:1px solid #e8e9f0;text-align:center;color:#8a8aaa;">
+                        <p style="font-size:48px;margin-bottom:16px;">👤</p>
+                        <p style="font-size:18px;font-weight:500;color:#4a4a6a;">Войдите в аккаунт</p>
+                        <p style="font-size:14px;">Нажмите "Войти" в шапке сайта</p>
+                    </div>
+                </section>
+
+                <!-- ===== СТРАНИЦА: ДЕТАЛЬНАЯ КНИГА ===== -->
+                <section id="page-book" class="page">
+                    <button id="backToCatalog" class="back-btn">← Назад к каталогу</button>
+                    <div id="bookDetail" class="book-detail">
+                        <!-- Детальная информация -->
+                    </div>
+                </section>
+
+                <!-- ===== СТРАНИЦА: АДМИН-ПАНЕЛЬ ===== -->
+                <section id="page-admin" class="page">
+                    <h2 style="font-size:28px;font-weight:800;margin-bottom:24px;">⚙️ Административная панель</h2>
+                    <div id="adminContent" style="background:white;border-radius:12px;padding:32px;border:1px solid #e8e9f0;text-align:center;color:#8a8aaa;">
+                        <p style="font-size:48px;margin-bottom:16px;">🔒</p>
+                        <p style="font-size:18px;font-weight:500;color:#4a4a6a;">Доступ только для администратора</p>
+                        <p style="font-size:14px;">Войдите как admin для доступа</p>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- ===== ПОДВАЛ ===== -->
+    <footer class="footer">
+        <div class="container">
+            <p>© 2026 Электронная библиотека. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <!-- ============================================
+    ВЕСЬ JS В ОДНОМ ФАЙЛЕ
+    ============================================ -->
+    <script>
+        // ============================================
+        // МОДУЛЬ ДАННЫХ (DataManager)
+        // ============================================
+        
+        const STORAGE_KEYS = {
+            BOOKS: 'library_books',
+            USERS: 'library_users',
+            PERSONAL_LIBRARY: 'library_personal',
+            SETTINGS: 'library_settings',
+            CURRENT_USER: 'library_current_user'
+        };
+
+        class DataManager {
+            constructor() {
+                this.initData();
+            }
+
+            initData() {
+                // Инициализация книг
+                if (!localStorage.getItem(STORAGE_KEYS.BOOKS)) {
+                    const initialBooks = [
+                        {
+                            id: 1,
+                            title: "Война и мир",
+                            author: "Лев Толстой",
+                            genre: "Роман",
+                            year: 1869,
+                            description: "Великий роман-эпопея о судьбах русского общества в эпоху Наполеоновских войн. Сложные переплетения личных отношений и исторических событий, судьбы героев на фоне грандиозных перемен.",
+                            ratingAvg: 4.8,
+                            ratingCount: 1250,
+                            viewCount: 10000
+                        },
+                        {
+                            id: 2,
+                            title: "Преступление и наказание",
+                            author: "Фёдор Достоевский",
+                            genre: "Роман",
+                            year: 1866,
+                            description: "Роман о студенте Родионе Раскольникове, который совершает убийство, пытаясь проверить свою теорию о 'праве сильной личности'. Глубокое исследование психологии преступника и путей искупления.",
+                            ratingAvg: 4.7,
+                            ratingCount: 980,
+                            viewCount: 8500
+                        },
+                        {
+                            id: 3,
+                            title: "1984",
+                            author: "Джордж Оруэлл",
+                            genre: "Фантастика",
+                            year: 1949,
+                            description: "Роман-антиутопия о тоталитарном обществе, где правительство 'Большой Брат' контролирует все аспекты жизни людей. Мир, где свобода мысли и личной жизни становится преступлением.",
+                            ratingAvg: 4.6,
+                            ratingCount: 2100,
+                            viewCount: 15000
+                        },
+                        {
+                            id: 4,
+                            title: "Мастер и Маргарита",
+                            author: "Михаил Булгаков",
+                            genre: "Роман",
+                            year: 1967,
+                            description: "Гениальный роман, в котором переплетаются сатира, фантастика и философская притча. Сатана приезжает в Москву и переворачивает жизнь города с ног на голову.",
+                            ratingAvg: 4.9,
+                            ratingCount: 1800,
+                            viewCount: 12000
+                        },
+                        {
+                            id: 5,
+                            title: "Дюна",
+                            author: "Фрэнк Герберт",
+                            genre: "Фантастика",
+                            year: 1965,
+                            description: "Эпическая сага о планете Арракис, где ведётся борьба за контроль над самым ценным ресурсом вселенной — спайсом. История о политике, религии и экологии на другом мире.",
+                            ratingAvg: 4.5,
+                            ratingCount: 1500,
+                            viewCount: 9000
+                        },
+                        {
+                            id: 6,
+                            title: "Убийство в Восточном экспрессе",
+                            author: "Агата Кристи",
+                            genre: "Детектив",
+                            year: 1934,
+                            description: "Знаменитый детектив Эркюль Пуаро расследует убийство в поезде 'Восточный экспресс'. Каждый пассажир под подозрением, и у каждого есть мотив. Классический детектив с неожиданной развязкой.",
+                            ratingAvg: 4.4,
+                            ratingCount: 750,
+                            viewCount: 6000
+                        },
+                        {
+                            id: 7,
+                            title: "Краткая история времени",
+                            author: "Стивен Хокинг",
+                            genre: "Научная литература",
+                            year: 1988,
+                            description: "Увлекательное путешествие по вселенной, от Большого Взрыва до чёрных дыр. Хокинг объясняет сложнейшие концепции современной физики понятным языком.",
+                            ratingAvg: 4.3,
+                            ratingCount: 800,
+                            viewCount: 5000
+                        },
+                        {
+                            id: 8,
+                            title: "Евгений Онегин",
+                            author: "Александр Пушкин",
+                            genre: "Поэзия",
+                            year: 1833,
+                            description: "Роман в стихах, который стал энциклопедией русской жизни начала XIX века. История трагической любви Евгения Онегина и Татьяны Лариной.",
+                            ratingAvg: 4.8,
+                            ratingCount: 600,
+                            viewCount: 4000
+                        }
+                    ];
+                    localStorage.setItem(STORAGE_KEYS.BOOKS, JSON.stringify(initialBooks));
+                }
+
+                if (!localStorage.getItem(STORAGE_KEYS.USERS)) {
+                    const initialUsers = [
+                        {
+                            id: 1,
+                            username: "admin",
+                            email: "admin@library.com",
+                            password: "admin123",
+                            role: "admin"
+                        },
+                        {
+                            id: 2,
+                            username: "user",
+                            email: "user@library.com",
+                            password: "user123",
+                            role: "user"
+                        }
+                    ];
+                    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(initialUsers));
+                }
+
+                if (!localStorage.getItem(STORAGE_KEYS.PERSONAL_LIBRARY)) {
+                    localStorage.setItem(STORAGE_KEYS.PERSONAL_LIBRARY, JSON.stringify([]));
+                }
+                if (!localStorage.getItem(STORAGE_KEYS.SETTINGS)) {
+                    localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify({ theme: 'light' }));
+                }
+                if (!localStorage.getItem(STORAGE_KEYS.CURRENT_USER)) {
+                    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(null));
+                }
+            }
+
+            getBooks() {
+                return JSON.parse(localStorage.getItem(STORAGE_KEYS.BOOKS) || '[]');
+            }
+
+            getBook(id) {
+                const books = this.getBooks();
+                return books.find(b => b.id === id);
+            }
+
+            getUsers() {
+                return JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+            }
+
+            getUserByUsername(username) {
+                const users = this.getUsers();
+                return users.find(u => u.username === username || u.email === username);
+            }
+
+            getCurrentUser() {
+                return JSON.parse(localStorage.getItem(STORAGE_KEYS.CURRENT_USER));
+            }
+
+            setCurrentUser(user) {
+                localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
+            }
+
+            logout() {
+                localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(null));
+            }
+
+            getSettings() {
+                return JSON.parse(localStorage.getItem(STORAGE_KEYS.SETTINGS) || '{"theme":"light"}');
+            }
+
+            saveSettings(settings) {
+                localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+            }
+
+            isInLibrary(userId, bookId) {
+                if (!userId) return false;
+                const library = JSON.parse(localStorage.getItem(STORAGE_KEYS.PERSONAL_LIBRARY) || '[]');
+                return library.some(item => item.userId === userId && item.bookId === bookId);
+            }
+
+            addToLibrary(userId, bookId) {
+                if (!userId) return false;
+                const library = JSON.parse(localStorage.getItem(STORAGE_KEYS.PERSONAL_LIBRARY) || '[]');
+                if (library.some(item => item.userId === userId && item.bookId === bookId)) {
+                    return false;
+                }
+                library.push({
+                    userId,
+                    bookId,
+                    isFavorite: false,
+                    status: 'reading',
+                    currentPage: 1,
+                    progressPercent: 0,
+                    addedAt: new Date().toISOString()
+                });
+                localStorage.setItem(STORAGE_KEYS.PERSONAL_LIBRARY, JSON.stringify(library));
+                return true;
+            }
+
+            toggleFavorite(userId, bookId) {
+                if (!userId) return false;
+                const library = JSON.parse(localStorage.getItem(STORAGE_KEYS.PERSONAL_LIBRARY) || '[]');
+                const item = library.find(i => i.userId === userId && i.bookId === bookId);
+                if (item) {
+                    item.isFavorite = !item.isFavorite;
+                    localStorage.setItem(STORAGE_KEYS.PERSONAL_LIBRARY, JSON.stringify(library));
+                    return item.isFavorite;
+                }
+                return false;
+            }
+        }
+
+        // ============================================
+        // ГЛАВНОЕ ПРИЛОЖЕНИЕ
+        // ============================================
+        
+        const dataManager = new DataManager();
+        let currentPage = 'catalog';
+        let currentBookId = null;
+
+        // ===== Инициализация =====
+        document.addEventListener('DOMContentLoaded', function() {
+            applySettings();
+            setupRouting();
+            setupTheme();
+            setupAuth();
+            renderCatalog();
+            updateUserUI();
+        });
+
+        // ===== Маршрутизация =====
+        function setupRouting() {
+            document.querySelectorAll('.header__nav a[data-page]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.dataset.page;
+                    navigateTo(page);
+                });
+            });
+
+            document.getElementById('backToCatalog').addEventListener('click', function() {
+                navigateTo('catalog');
+            });
+        }
+
+        function navigateTo(page, data = null) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            
+            const targetPage = document.getElementById(`page-${page}`);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+            
+            document.querySelectorAll('.header__nav a[data-page]').forEach(link => {
+                link.classList.toggle('active', link.dataset.page === page);
+            });
+            
+            currentPage = page;
+            
+            switch(page) {
+                case 'catalog':
+                    renderCatalog();
+                    break;
+                case 'book':
+                    if (data && data.bookId) {
+                        currentBookId = data.bookId;
+                        renderBookDetail(data.bookId);
+                    }
+                    break;
+                case 'profile':
+                    renderProfile();
+                    break;
+                case 'admin':
+                    renderAdmin();
+                    break;
+            }
+        }
+
+        // ===== Тема =====
+        function setupTheme() {
+            const toggle = document.getElementById('themeToggle');
+            const settings = dataManager.getSettings();
+            
+            if (settings.theme === 'dark') {
+                document.body.classList.add('dark-theme');
+                toggle.textContent = '☀️';
+            }
+            
+            toggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark-theme');
+                const isDark = document.body.classList.contains('dark-theme');
+                this.textContent = isDark ? '☀️' : '🌙';
+                
+                const settings = dataManager.getSettings();
+                settings.theme = isDark ? 'dark' : 'light';
+                dataManager.saveSettings(settings);
+            });
+        }
+
+        function applySettings() {
+            const settings = dataManager.getSettings();
+            if (settings.theme === 'dark') {
+                document.body.classList.add('dark-theme');
+                document.getElementById('themeToggle').textContent = '☀️';
+            }
+        }
+
+        // ===== Авторизация =====
+        function setupAuth() {
+            const btn = document.getElementById('authBtn');
+            btn.addEventListener('click', function() {
+                const user = dataManager.getCurrentUser();
+                if (user) {
+                    if (confirm('Выйти из аккаунта?')) {
+                        dataManager.logout();
+                        updateUserUI();
+                        navigateTo('catalog');
+                    }
+                } else {
+                    showLoginModal();
+                }
+            });
+        }
+
+        function showLoginModal() {
+            const username = prompt('Введите имя пользователя (admin или user):');
+            if (!username) return;
+            
+            const password = prompt('Введите пароль (admin123 или user123):');
+            if (!password) return;
+            
+            const user = dataManager.getUserByUsername(username);
+            if (user && user.password === password) {
+                dataManager.setCurrentUser(user);
+                updateUserUI();
+                alert(`✅ Добро пожаловать, ${user.username}!`);
+                navigateTo('catalog');
+            } else {
+                alert('❌ Неверное имя пользователя или пароль!');
+            }
+        }
+
+        function updateUserUI() {
+            const user = dataManager.getCurrentUser();
+            const btn = document.getElementById('authBtn');
+            const adminLink = document.getElementById('adminLink');
+            
+            if (user) {
+                btn.textContent = `👤 ${user.username}`;
+                if (user.role === 'admin') {
+                    adminLink.style.display = 'inline';
+                } else {
+                    adminLink.style.display = 'none';
+                }
+            } else {
+                btn.textContent = 'Войти';
+                adminLink.style.display = 'none';
+            }
+        }
+
+        // ============================================
+        // РЕНДЕРИНГ КАТАЛОГА (БЕЗ ОБЛОЖЕК)
+        // ============================================
+        
+        let currentPageNum = 1;
+        const pageSize = 8;
+
+        function renderCatalog() {
+            let books = dataManager.getBooks();
+            const search = document.getElementById('searchInput').value.toLowerCase().trim();
+            const genre = document.getElementById('genreFilter').value;
+            const sort = document.getElementById('sortFilter').value;
+
+            // Поиск
+            if (search) {
+                books = books.filter(b => 
+                    b.title.toLowerCase().includes(search) || 
+                    b.author.toLowerCase().includes(search)
+                );
+            }
+
+            // Фильтр по жанру
+            if (genre !== 'all') {
+                books = books.filter(b => b.genre === genre);
+            }
+
+            // Сортировка
+            switch(sort) {
+                case 'popularity':
+                    books.sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0));
+                    break;
+                case 'rating':
+                    books.sort((a, b) => (b.ratingAvg || 0) - (a.ratingAvg || 0));
+                    break;
+                case 'newest':
+                    books.sort((a, b) => b.year - a.year);
+                    break;
+                case 'title':
+                    books.sort((a, b) => a.title.localeCompare(b.title));
+                    break;
+            }
+
+            const totalPages = Math.ceil(books.length / pageSize);
+            if (currentPageNum > totalPages) currentPageNum = Math.max(1, totalPages);
+            
+            const start = (currentPageNum - 1) * pageSize;
+            const end = Math.min(start + pageSize, books.length);
+            const pageBooks = books.slice(start, end);
+
+            // Рендеринг
+            const grid = document.getElementById('booksGrid');
+            const user = dataManager.getCurrentUser();
+            
+            if (pageBooks.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <span class="icon">📭</span>
+                        <p class="title">Книг не найдено</p>
+                        <p class="subtitle">Попробуйте изменить параметры поиска</p>
+                    </div>
+                `;
+            } else {
+                grid.innerHTML = pageBooks.map(book => {
+                    const stars = '⭐'.repeat(Math.round(book.ratingAvg || 0));
+                    const inLibrary = dataManager.isInLibrary(user?.id, book.id);
+                    return `
+                        <div class="book-card" data-book-id="${book.id}">
+                            ${inLibrary ? '<span class="book-card__badge">✅ В библиотеке</span>' : ''}
+                            <div class="book-card__title">${book.title}</div>
+                            <div class="book-card__author">${book.author}</div>
+                            <div class="book-card__meta">
+                                <div class="book-card__rating">
+                                    <span class="stars">${stars || '☆'}</span>
+                                    <span>${(book.ratingAvg || 0).toFixed(1)}</span>
+                                </div>
+                                <div class="book-card__year">${book.year}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // Пагинация
+            document.getElementById('prevPage').disabled = currentPageNum <= 1;
+            document.getElementById('nextPage').disabled = currentPageNum >= totalPages || totalPages === 0;
+            document.getElementById('pageInfo').textContent = totalPages > 0 
+                ? `Страница ${currentPageNum} из ${totalPages}` 
+                : 'Нет книг';
+
+            // Обработчики на карточки
+            grid.querySelectorAll('.book-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const id = parseInt(this.dataset.bookId);
+                    navigateTo('book', { bookId: id });
+                });
+            });
+
+            // Обработчики пагинации
+            document.getElementById('prevPage').onclick = function() {
+                if (currentPageNum > 1) {
+                    currentPageNum--;
+                    renderCatalog();
+                }
+            };
+            document.getElementById('nextPage').onclick = function() {
+                currentPageNum++;
+                renderCatalog();
+            };
+        }
+
+        // ===== Обработчики фильтров =====
+        document.getElementById('searchInput').addEventListener('input', function() {
+            currentPageNum = 1;
+            renderCatalog();
+        });
+        document.getElementById('genreFilter').addEventListener('change', function() {
+            currentPageNum = 1;
+            renderCatalog();
+        });
+        document.getElementById('sortFilter').addEventListener('change', function() {
+            renderCatalog();
+        });
+
+        // ============================================
+        // РЕНДЕРИНГ СТРАНИЦЫ КНИГИ (БЕЗ ОБЛОЖКИ)
+        // ============================================
+        
+        function renderBookDetail(bookId) {
+            const book = dataManager.getBook(bookId);
+            const container = document.getElementById('bookDetail');
+            const user = dataManager.getCurrentUser();
+            
+            if (!book) {
+                container.innerHTML = '<p>Книга не найдена</p>';
+                return;
+            }
+
+            const stars = '⭐'.repeat(Math.round(book.ratingAvg || 0));
+            const inLibrary = dataManager.isInLibrary(user?.id, book.id);
+
+            container.innerHTML = `
+                <div class="book-detail__header">
+                    <div class="book-detail__info">
+                        <h1 class="book-detail__title">${book.title}</h1>
+                        <div class="book-detail__author">${book.author}</div>
+                        <div class="book-detail__meta">
+                            <span>📚 ${book.genre}</span>
+                            <span>📅 ${book.year}</span>
+                            <span>👁️ ${book.viewCount || 0} просмотров</span>
+                        </div>
+                        <div class="book-detail__rating">
+                            <span class="stars">${stars || '☆'}</span>
+                            <span>${(book.ratingAvg || 0).toFixed(1)}</span>
+                            <span class="count">(${book.ratingCount || 0} оценок)</span>
+                        </div>
+                        <p class="book-detail__description">${book.description || 'Описание отсутствует'}</p>
+                        <div class="book-detail__actions">
+                            <button onclick="alert('📖 Чтение книги: ${book.title}')" class="btn-primary">📖 Читать</button>
+                            ${user ? `
+                                <button onclick="handleAddToLibrary(${book.id})" class="btn-secondary">
+                                    ${inLibrary ? '✅ В библиотеке' : '📚 В библиотеку'}
+                                </button>
+                                <button onclick="handleToggleFavorite(${book.id})" class="btn-secondary">
+                                    ${inLibrary ? '⭐ В избранном' : '☆ В избранное'}
+                                </button>
+                            ` : `
+                                <button onclick="alert('Войдите в аккаунт, чтобы добавить книгу в библиотеку')" class="btn-secondary">🔒 Войдите для добавления</button>
+                            `}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleAddToLibrary(bookId) {
+            const user = dataManager.getCurrentUser();
+            if (!user) {
+                alert('Войдите в аккаунт!');
+                return;
+            }
+            const result = dataManager.addToLibrary(user.id, bookId);
+            if (result) {
+                alert('✅ Книга добавлена в библиотеку!');
+                renderBookDetail(bookId);
+                renderCatalog();
+            } else {
+                alert('ℹ️ Книга уже в библиотеке');
+            }
+        }
+
+        function handleToggleFavorite(bookId) {
+            const user = dataManager.getCurrentUser();
+            if (!user) {
+                alert('Войдите в аккаунт!');
+                return;
+            }
+            const isFavorite = dataManager.toggleFavorite(user.id, bookId);
+            alert(isFavorite ? '⭐ Добавлено в избранное!' : '☆ Убрано из избранного');
+            renderBookDetail(bookId);
+        }
+
+        // ============================================
+        // РЕНДЕРИНГ ПРОФИЛЯ
+        // ============================================
+        
+        function renderProfile() {
+            const container = document.getElementById('profileContent');
+            const user = dataManager.getCurrentUser();
+            
+            if (!user) {
+                container.innerHTML = `
+                    <p style="font-size:48px;margin-bottom:16px;">👤</p>
+                    <p style="font-size:18px;font-weight:500;color:#4a4a6a;">Войдите в аккаунт</p>
+                    <p style="font-size:14px;">Нажмите "Войти" в шапке сайта</p>
+                `;
+                return;
+            }
+
+            const books = dataManager.getBooks();
+            const library = JSON.parse(localStorage.getItem(STORAGE_KEYS.PERSONAL_LIBRARY) || '[]');
+            const userBooks = library.filter(item => item.userId === user.id);
+            
+            let booksList = '';
+            if (userBooks.length === 0) {
+                booksList = '<p style="color:#8a8aaa;">У вас пока нет книг в библиотеке</p>';
+            } else {
+                booksList = userBooks.map(item => {
+                    const book = books.find(b => b.id === item.bookId);
+                    if (!book) return '';
+                    return `
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #e8e9f0;">
+                            <div>
+                                <strong>${book.title}</strong>
+                                <span style="color:#8a8aaa;font-size:14px;margin-left:8px;">${book.author}</span>
+                            </div>
+                            <span style="font-size:12px;color:#8a8aaa;">
+                                ${item.isFavorite ? '⭐ ' : ''}
+                                ${item.status === 'completed' ? '✅ Прочитано' : '📖 Читает'}
+                            </span>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            container.innerHTML = `
+                <div style="display:flex;align-items:center;gap:24px;margin-bottom:24px;">
+                    <span style="font-size:64px;">${user.role === 'admin' ? '👨‍💼' : '👤'}</span>
+                    <div>
+                        <h3 style="font-size:24px;font-weight:700;">${user.username}</h3>
+                        <p style="color:#6a6a8a;">${user.email}</p>
+                        <p style="color:#8a8aaa;font-size:14px;">Роль: ${user.role === 'admin' ? 'Администратор' : 'Пользователь'}</p>
+                    </div>
+                </div>
+                <hr style="border:none;border-top:1px solid #e8e9f0;margin:16px 0;">
+                <h4 style="font-size:18px;font-weight:600;margin-bottom:12px;">📚 Мои книги (${userBooks.length})</h4>
+                <div style="background:#f8f9fe;border-radius:8px;padding:16px;max-height:300px;overflow-y:auto;">
+                    ${booksList}
+                </div>
+                <p style="color:#8a8aaa;font-size:14px;margin-top:16px;">Для выхода нажмите на кнопку "Выйти" в шапке сайта</p>
+            `;
+        }
+
+        // ============================================
+        // РЕНДЕРИНГ АДМИН-ПАНЕЛИ
+        // ============================================
+        
+        function renderAdmin() {
+            const container = document.getElementById('adminContent');
+            const user = dataManager.getCurrentUser();
+            
+            if (!user || user.role !== 'admin') {
+                container.innerHTML = `
+                    <p style="font-size:48px;margin-bottom:16px;">🔒</p>
+                    <p style="font-size:18px;font-weight:500;color:#4a4a6a;">Доступ только для администратора</p>
+                    <p style="font-size:14px;">Войдите как admin для доступа</p>
+                `;
+                return;
+            }
+
+            const books = dataManager.getBooks();
+            container.innerHTML = `
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
+                    <div style="background:#f8f9fe;border-radius:12px;padding:20px;text-align:center;">
+                        <h4 style="color:#8a8aaa;font-size:14px;">📚 Книг</h4>
+                        <span style="font-size:28px;font-weight:800;color:#6C63FF;">${books.length}</span>
+                    </div>
+                    <div style="background:#f8f9fe;border-radius:12px;padding:20px;text-align:center;">
+                        <h4 style="color:#8a8aaa;font-size:14px;">👤 Пользователей</h4>
+                        <span style="font-size:28px;font-weight:800;color:#6C63FF;">${dataManager.getUsers().length}</span>
+                    </div>
+                    <div style="background:#f8f9fe;border-radius:12px;padding:20px;text-align:center;">
+                        <h4 style="color:#8a8aaa;font-size:14px;">📖 Всего книг</h4>
+                        <span style="font-size:28px;font-weight:800;color:#6C63FF;">${books.length}</span>
+                    </div>
+                </div>
+                <div style="background:#f8f9fe;border-radius:12px;padding:24px;">
+                    <h4 style="font-size:18px;font-weight:600;margin-bottom:16px;">📋 Список всех книг</h4>
+                    ${books.length === 0 ? '<p style="color:#8a8aaa;">Книг пока нет</p>' : 
+                        books.map(book => `
+                            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #e8e9f0;">
+                                <div>
+                                    <span style="font-weight:500;">${book.title}</span>
+                                    <span style="color:#8a8aaa;font-size:14px;margin-left:12px;">${book.author}</span>
+                                </div>
+                                <span style="color:#8a8aaa;font-size:12px;">${book.genre} • ${book.year}</span>
+                            </div>
+                        `).join('')
+                    }
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
